@@ -1,0 +1,29 @@
+http:
+  routers:
+    dashboard:
+      rule: "PathPrefix(`/dashboard`) || PathPrefix(`/api`)"
+      service: api@internal
+      middlewares:
+        - dashboard-auth
+      entryPoints:
+        - web
+      priority: 100
+
+    backend:
+      rule: "PathPrefix(`/`)"
+      service: backend-service
+      entryPoints:
+        - web
+      priority: 1
+
+  middlewares:
+    dashboard-auth:
+      basicAuth:
+        users:
+          - "${DASHBOARD_BASIC_AUTH}"
+
+  services:
+    backend-service:
+      loadBalancer:
+        servers:
+          - url: "${API_URL}"
